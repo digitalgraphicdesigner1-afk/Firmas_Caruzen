@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Estrategia Sistema Filtro y Cierre - Caruzen Motors</title>
+  <style>
+    :root {
+      --bg-color: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --primary: #0F172A;
+      --accent: #2563EB;
+      --accent-light: #EFF6FF;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .slider {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      transition: transform 0.4s ease-in-out;
+    }
+
+    .slide {
+      min-width: 100vw;
+      height: 100vh;
+      padding: 2rem 4rem 5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      background: var(--bg-color);
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.8rem;
+    }
+
+    .brand-logo {
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .slide-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: start;
+      margin: 1rem 0;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .text-content h1 {
+      font-size: 2.2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .text-content h2 {
+      font-size: 1.6rem;
+      color: var(--primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .meta-box {
+      background: #FEF3C7;
+      border-left: 4px solid #D97706;
+      padding: 0.8rem 1rem;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      color: #92400E;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .content-card h3 {
+      font-size: 1.05rem;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .content-card p, .content-card li {
+      font-size: 0.92rem;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    .content-card ul {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+
+    .content-card li {
+      margin-bottom: 0.4rem;
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .content-card li::before {
+      content: "•";
+      color: var(--accent);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+
+    .script-quote {
+      background: #F1F5F9;
+      border-left: 3px solid var(--primary);
+      padding: 0.6rem 0.8rem;
+      margin-top: 0.5rem;
+      font-size: 0.88rem;
+      color: #334155;
+      font-style: italic;
+    }
+
+    .media-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-card img {
+      max-width: 100%;
+      max-height: 55vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .vertical-video-container {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      height: 520px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      background: #000;
+      margin: 0 auto;
+    }
+
+    .vertical-video-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .fallback-btn {
+      margin-top: 0.8rem;
+      display: inline-block;
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .slide-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-color);
+      padding: 0.8rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slider" id="slider">
+
+    <!-- SLIDE 1: PORTADA & ESTRATEGIA -->
+    <section class="slide">
+      <div class="slide-header">
+        <img src="./logo-caruzen.png" alt="Caruzen Motors" class="brand-logo"/>
+        <span class="slide-tag">Estrategia Comercial</span>
+      </div>
+      <div class="slide-body">
+        <div class="text-content">
+          <h1>ESTRATEGIA SISTEMA FILTRO Y CIERRE</h1>
+          <div class="meta-box">
+            META: Limpiar la base de datos existente (Leads Tibios / Fríos), calificar y llevar tráfico presencial al lote.
+          </div>
+
+          <div class="content-card">
+            <h3>Estructura del Mensaje (Fase 2)</h3>
+            <ul>
+              <li><strong>1. Dolor:</strong> Impacto directo en los primeros 3 segundos.</li>
+              <li><strong>2. Solución con Caruzo:</strong> Exposición de propuesta en 5 segundos.</li>
+              <li><strong>3. CTA Directo:</strong> Teléfono y Dirección en 3 segundos.</li>
+            </ul>
+          </div>
+
+          <div class="content-card">
+            <h3>Información del Dealer</h3>
+            <p><strong>📍 Dirección:</strong> 1417 N Durham Dr, Houston, TX 77008</p>
+            <p><strong>📞 Teléfono:</strong> (713) 325-6139</p>
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="./Diagrama_de_Flujo.png" alt="Diagrama de Flujo del Sistema" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: DIAGRAMA & FASES -->
+    <section class="slide">
+      <div class="slide-header">
+        <img src="./logo-caruzen.png" alt="Caruzen Motors" class="brand-logo"/>
+        <span class="slide-tag">Flujo de Trabajo</span>
+      </div>
+      <div class="slide-body">
+        <div class="text-content">
+          <h2>Secuencia de Reactivación Omnicanal</h2>
+          <p style="margin-bottom:1rem; color:var(--text-muted);">Estrategia ejecutada vía Call + SMS + Email para máxima conversión.</p>
+
+          <div class="content-card">
+            <h3>Fase 1: Segmentación por Causa de Freno</h3>
+            <ul>
+              <li><strong>Tag 1:</strong> (No contesta / Frío) - "Los fantasmas"</li>
+              <li><strong>Tag 2:</strong> (Solo Pasaporte) - Sin licencia de Texas</li>
+              <li><strong>Tag 3:</strong> (Presupuesto &lt; $2,000) - Poco Down Payment</li>
+              <li><strong>Tag 4:</strong> (Sin Score / Reposesión / Rejected por Banco)</li>
+            </ul>
+          </div>
+
+          <div class="content-card">
+            <h3>Fase 2: Ejecución CRM y BDR</h3>
+            <ul>
+              <li><strong>Campaña SMS:</strong> Micro-nutrición automática con disparos cortos.</li>
+              <li><strong>Caruzo CRM:</strong> Filtro activo de calificación y contenido nutritivo.</li>
+              <li><strong>BDR:</strong> Contacto directo, persuasión y cierre de cita confirmada.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="./Diagrama_de_Flujo.png" alt="Diagrama de Flujo" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: TAG 1 -->
+    <section class="slide">
+      <div class="slide-header">
+        <img src="./logo-caruzen.png" alt="Caruzen Motors" class="brand-logo"/>
+        <span class="slide-tag">TAG 1: No responde / Frío</span>
+      </div>
+      <div class="slide-body">
+        <div class="text-content">
+          <h2>"Los Fantasmas"</h2>
+
+          <div class="content-card">
+            <h3>Pieza Gráfica / Táctica SMS</h3>
+            <p><em>"Sabemos que pasas ocupado y no pudiste contestar... ¡Pero tu próximo auto no puede esperar más!"</em></p>
+            <ul>
+              <li>🛡️ <strong>24 Meses de Garantía:</strong> Protegemos tu inversión ante cualquier falla mecánica.</li>
+              <li>🛢️ <strong>2 Cambios de Aceite GRATIS:</strong> Mantenimiento por nuestra cuenta para que arranques sin gastos extra.</li>
+              <li>🚘 <strong>Inventario Seleccionado:</strong> Seminuevos, bajo millaje y modelos recientes inspeccionados.</li>
+            </ul>
+            <p style="margin-top:0.5rem; font-weight:600;">📞 (713) 325-6139 | 📍 1417 N Durham Dr, Houston, TX 77008</p>
+            <span style="font-size:0.75rem; color:var(--text-muted);">*Aplican términos y condiciones</span>
+          </div>
+
+          <div class="content-card">
+            <h3>Guión Reel (Caruzo)</h3>
+            <p><strong>Visual:</strong> Caruzo dirigiéndose a la cámara en el dealer.</p>
+            <div class="script-quote">
+              "¡Hola! Soy Caruzo. Sabemos que pasas ocupado entre el trabajo y la rutina diaria, y por eso no pudiste contestar... ¡pero tu próximo auto no puede esperar más! Reactiva tu proceso hoy mismo con nosotros y llévate estos beneficios exclusivos: 24 Meses de Garantía, 2 Cambios de Aceite GRATIS e Inventario Seleccionado... ¡No dejes pasar esta oportunidad! Llámanos hoy al (713) 325-6139 o visítanos en 1417 N Durham Dr."
+            </div>
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="./Pieza_Tag_1.png" alt="Pieza Gráfica Tag 1" style="margin-bottom:1rem;" />
+          <div class="vertical-video-container">
+            <iframe src="https://www.youtube-nocookie.com/embed/AbrsymoxiP0" title="Reel Tag 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+          <a href="https://youtube.com/shorts/AbrsymoxiP0" target="_blank" class="fallback-btn">▶ Abrir Video en YouTube Directo</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: TAG 2 -->
+    <section class="slide">
+      <div class="slide-header">
+        <img src="./logo-caruzen.png" alt="Caruzen Motors" class="brand-logo"/>
+        <span class="slide-tag">TAG 2: Solo Pasaporte</span>
+      </div>
+      <div class="slide-body">
+        <div class="text-content">
+          <h2>Sin Licencia de Conducir</h2>
+
+          <div class="content-card">
+            <h3>Pieza Gráfica / Táctica SMS</h3>
+            <p><strong>¿Te dijeron que sin licencia no podías comprar un auto en Texas?</strong></p>
+            <p style="color:var(--accent); font-weight:bold; margin:0.3rem 0;">¡LA LEY CAMBIÓ, PERO TU SOLUCIÓN ESTÁ AQUÍ! 📌</p>
+            <p><strong>La Solución Co-aplicante:</strong> Trae a un familiar, amigo o tu pareja con Licencia de Texas. El vehículo sale con respaldo legal y tú no pierdes la oportunidad de estrenar. Unidades seminuevas, certificadas y listas para entrega inmediata.</p>
+            <p style="margin-top:0.5rem; font-weight:600;">📞 (713) 325-6139 | 📍 1417 N Durham Dr, Houston, TX 77008</p>
+            <span style="font-size:0.75rem; color:var(--text-muted);">*Aplican términos y condiciones</span>
+          </div>
+
+          <div class="content-card">
+            <h3>Guión Reel (Caruzo)</h3>
+            <p><strong>Visual:</strong> Caruzo sosteniendo un pasaporte en la mano y caminando hacia la oficina del dealer.</p>
+            <div class="script-quote">
+              <strong>(0-10s):</strong> "A ver, aclaremos esto de una vez por todas. Es verdad que con las nuevas normativas en Texas te exigen licencia de conducir... Pero... ¿Quién dijo que tenías que hacer el trámite solo?"<br/>
+              <strong>(10-23s):</strong> "Si tú tienes tu pasaporte, tu down payment y tus ganas de salir adelante, lo único que necesitas es traer a un Co-aplicante... Con esa combinación, nosotros armamos la estructura y sales manejando tu vehículo seminuevo hoy mismo."<br/>
+              <strong>(23-35s):</strong> "No dejes que un trámite te deje caminando en Houston. Ven con tu co-aplicante, dinos cuál auto te gusta y nos encargamos del resto."
+            </div>
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="./PIEZA%20TAG%202.png" alt="Pieza Gráfica Tag 2" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: TAG 3 -->
+    <section class="slide">
+      <div class="slide-header">
+        <img src="./logo-caruzen.png" alt="Caruzen Motors" class="brand-logo"/>
+        <span class="slide-tag">TAG 3: Poco Presupuesto</span>
+      </div>
+      <div class="slide-body">
+        <div class="text-content">
+          <h2>Sin Down Payment Alto</h2>
+
+          <div class="content-card">
+            <h3>Pieza Gráfica / Táctica SMS</h3>
+            <p><strong>No necesitas $5,000 para estrenar un buen auto en Houston.</strong></p>
+            <p style="color:var(--accent); font-weight:bold; margin:0.3rem 0;">ESTRENA CON INICIAL ACCESIBLE</p>
+            <ul>
+              <li>💵 <strong>Down Payment desde $1,500:</strong> No desgastes todos tus ahorros para tener transporte digno.</li>
+              <li>🚘 <strong>Calidad Garantizada:</strong> Unidades de modelos recientes, bajo millaje y mecánicamente inspeccionadas.</li>
+              <li>📊 <strong>Cuotas Adaptadas:</strong> Ajustamos las cuotas mensuales a tu presupuesto real para que no vivas ahorcado.</li>
+            </ul>
+            <p style="margin-top:0.5rem; font-weight:600;">📞 (713) 325-6139 | 📍 1417 N Durham Dr, Houston, TX 77008</p>
+          </div>
+
+          <div class="content-card">
+            <h3>Guión Reel (Caruzo)</h3>
+            <p><strong>Visual:</strong> Caruzo sentado en el capó de un carro impecable, contando billetes o simulando hacer cuentas.</p>
+            <div class="script-quote">
+              <strong>(0-10s):</strong> "¿A poco crees que para tener las llaves a un auto bonito y de modelo reciente necesitas llegar con $7,000 o $8,000 en el bolsillo? ¡Por favor!"<br/>
+              <strong>(10-23s):</strong> "Aquí en el dealer entendemos que el dinero cuesta ganárselo y no queremos que te quedes sin liquidez... Por eso tenemos un inventario de seminuevos con Down Payment desde solo $1,500."<br/>
+              <strong>(23-35s):</strong> "Un inicial cómodo y mensualidades que sí vas a poder pagar sin quitarle la comida a tu mesa. Haz la prueba: llámanos ahora o ven a la 1417 N Durham Dr."
+            </div>
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="./PIEZA%20TAG%203.png" alt="Pieza Gráfica Tag 3" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: TAG 4 -->
+    <section class="slide">
+      <div class="slide-header">
+        <img src="./logo-caruzen.png" alt="Caruzen Motors" class="brand-logo"/>
+        <span class="slide-tag">TAG 4: Sin Crédito / Rejected</span>
+      </div>
+      <div class="slide-body">
+        <div class="text-content">
+          <h2>Sin Crédito / Mal Crédito</h2>
+
+          <div class="content-card">
+            <h3>Pieza Gráfica / Táctica SMS</h3>
+            <p><strong>¿Te dieron un 'NO' por tu crédito? Aquí tenemos más de 10 respuestas diferentes.</strong></p>
+            <p style="color:var(--accent); font-weight:bold; margin:0.3rem 0;">RECONSTRUYE TU CRÉDITO MIENTRAS MANEJAS</p>
+            <ul>
+              <li>🏦 <strong>+10 Financieras Aliadas:</strong> Múltiples opciones compitiendo por tu aprobación.</li>
+              <li>📈 <strong>Aprobación Garantizada:</strong> Reconstrucción de historial en cada pago.</li>
+              <li>🤝 <strong>Trato Directo:</strong> Transparente y enfocado en darte la mejor tasa posible.</li>
+            </ul>
+            <p style="margin-top:0.5rem; font-weight:600;">📞 (713) 325-6139 | 📍 1417 N Durham Dr, Houston, TX 77008</p>
+          </div>
+
+          <div class="content-card">
+            <h3>Guión Reel (Caruzo)</h3>
+            <p><strong>Visual:</strong> Caruzo caminando por la sala de ventas, se detiene frente al escritorio de financiamiento.</p>
+            <div class="script-quote">
+              <strong>(0-10s):</strong> "Sé lo frustrante que es ir a un dealer, ilusionarte con un auto y que a los 20 minutos te digan: 'Lo sentimos, tu crédito no califica'..."<br/>
+              <strong>(10-23s):</strong> "A ver, tu pasado crediticio no define quién eres hoy... Tenemos convenio con más de 10 financieras aliadas que compiten entre sí para darte la mejor tasa posible."<br/>
+              <strong>(23-35s):</strong> "Aquí no venimos a juzgarte, venimos a darte las llaves de tu auto. Pre-califica hoy mismo llamando al (713) 325-6139."
+            </div>
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img src="./Pieza_Tag_4.png" alt="Pieza Gráfica Tag 4" style="margin-bottom:1rem;" />
+          <div class="vertical-video-container">
+            <iframe src="https://www.youtube-nocookie.com/embed/1_1F3nfd8XM" title="Reel Tag 4" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+          <a href="https://youtube.com/shorts/1_1F3nfd8XM" target="_blank" class="fallback-btn">▶ Abrir Video en YouTube Directo</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="slide-footer">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()">← Anterior</button>
+    <div class="slide-counter" id="counter">Slide 1 de 6</div>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Siguiente →</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const slider = document.getElementById('slider');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const counter = document.getElementById('counter');
+
+    function updateSlide() {
+      slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+      counter.innerText = `Slide ${currentSlide + 1} de ${slides.length}`;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slides.length - 1;
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>
